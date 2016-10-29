@@ -1,1 +1,86 @@
-Empty template and README for HW4
+Steven Herring homework 4, complete Thursday May 5th for extra credit of 4 points.
+No other extra credit objectives were knowingly satisfied for this assignment.
+
+                    ************************************************
+                    ** How I tested my solution to the assignment **
+                    ************************************************
+        Pulled hw4 repository into a fresh, clean directory and did the following
+
+        -----DID THESE STEPS ONCE-----
+        aclocal && autoreconf -f -i && automake --add-missing
+        ./configure && make dist && cp skey-2.0.tar.gz ~
+        mkdir ~/tmp && cd ~/tmp && tar xzvf ~/skey-2.0.tar.gz
+
+        -----DID THESE FOR EACH SYSTEM-----
+        mkdir sysname && cd sysname
+        ../skey-2.0/configure --prefix=$HOME/skey-2.0/sysname --enable-debug --enable-shared
+        make all
+        make check
+        make install
+                    ************************************************
+                    ************************************************
+
+Due to lack of my own time on previous assignment, most changes were done from the start of hw4
+
+Removed PRE-ANSI declarations across source.
+Cleaned up some code.
+Moved most header declarations into skey.h
+Made files try to only include skey.h where applicable (mostly everywhere)
+Removed MS_DOS checks, unnecessary ifdefs, extends as requested.
+
+Added new features:
+-v flag to print version of package (for example "skey version 2.0")
+-h to print usage (with all new options)
+//-e to echo back the passphrase being entered (otherwise don't echo back)
+-d to print debugging/tracing output
+-l ARG: Set the logging device to ARG #
+
+-v was done by having a hard version # in the source code and printing it
+-h usage macro, with predefined help.
+-d debugging i used a macro to check for the debugging level and depending on that would define the debug functions differently. my methods can be viewed in debug.h, debug.c and skey.h
+-l logging also used macros to check if logging was set, if so check for a valid FD upon opening and port the output there
+
+Fixed Debugging logic that was causing debug output to route to an unknown location (segfault)
+Debugg functions were applied before and after functions inside skey.c, in some cases after and after (readpass as to avoid interfering with password gathering)
+
+Created configure.ac, Makefile.am, /src/Makefile.am - currently creates a full make file
+configures properly, makes, installs and runs correctly on b-freebsd91
+
+Added config check using configure.ac with AC_C_BIGENDIAN. Which defines WORDS_BIGENDIAN
+
+Added Makefile destinations to include man and scripts
+Added man/Makefile.am and scripts/Makefile.am to help extract man pages into distribution and use scripts for testing
+AC_CONFIG_FILES([Makefile src/Makefile man/Makefile scripts/Makefile])
+
+Add and Update AUTHORS files
+
+Fixed bug where output was different depending on the system being 32 or 64bit. Needed to use ints as opposed to longs for some variables in md4.h and md4.c
+
+Added and tested -e flag to work as intended. Used a flag variable and modified the signature for readpass to accomplish this
+
+Successfully built and installed w/o make check on 8/9 machines (OSX unavail.) getting consistent output across all 8
+
+Completed testing script using example from Zadok emails.
+Successfully got make check to work, modifying the script to look in the correct places of build directory
+
+Modified version number
+Modified usage to include -e
+
+Got static library linking by modifying Makefile.am for each directory involved in the library process.. this required organizing my directory structure
+Added lib and include folders that managed .C and .H files respectively
+
+#TODO: LIBTOOLS STUFF, MINOR ORGANIZATIONAL THINGS
+Attempted to use libtoolize to use dynamic linking, this didn't work, had to modify Makefile.am's on my own, not hard, very little translations a->la library->ltlibrary etc.
+
+OSX was not compiling due to clashing symbols multiple definitions of .h file - added header guard into skey.h to help
+also removed global variable definition of char* 'logFile'
+
+Had a bug where I was not preserving variable 'n' at some point in skey.c, this was causing my output to be wildly different than professors. Fixed, output now matches professors.
+Upon fix of this bug, OSX output was no longer consistent.
+OSX output bug was due to localization of the optind and optarg variables in skey.c caused by removing 'extern' key, instead removed their skey.c definition completely.
+
+Resolved setenv/getenv issue by doing a function check in configure.ac for getenv and setenv.
+Had to implement the given setenv and getenv functions that were supplied with SKEY distribution.
+Also in the cases we use setenv we needed to change the signature for when setenv is defined and when we used the given SKEY version
+
+Removed all left over system respective ifdefs, externs, etc, etc.
