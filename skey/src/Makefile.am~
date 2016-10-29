@@ -1,0 +1,5 @@
+bin_PROGRAMS = key keyinit keysh
+
+key_SOURCES = skey.c md4.h debug.h skey.h
+keyinit_SOURCES = skeyinit.c debug.c skeysubr.c skeylogin.c put.c md4.c md4.h skey.h
+keysh_SOURCES = skeysh.c debug.c skeysubr.c skeylogin.c put.c md4.c md4.h skey.h
